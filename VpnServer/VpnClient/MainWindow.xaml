@@ -1,0 +1,189 @@
+﻿<Window x:Class="VpnClient.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:VpnClient.Converters"
+        xmlns:vm="clr-namespace:VpnClient.ViewModels"
+        Title="ULTRA VPN" Height="700" Width="520"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent">
+
+    <Window.Resources>
+        <converters:StateToColorConverter x:Key="StateToColor"/>
+        <converters:StateToIconConverter x:Key="StateToIcon"/>
+        <converters:StateToTextConverter x:Key="StateToText"/>
+        <vm:MainViewModel x:Key="MainViewModel"/>
+    </Window.Resources>
+
+    <Grid DataContext="{StaticResource MainViewModel}">
+        <Border CornerRadius="20" Background="#1A1A2E" Margin="10">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" BlurRadius="15" Opacity="0.4"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="45"/>
+                </Grid.RowDefinitions>
+
+                <!-- Заголовок окна -->
+                <Border Grid.Row="0" Background="#2D2D44" CornerRadius="20,20,0,0"
+                        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+                    <Grid>
+                        <TextBlock Text="ULTRA VPN" VerticalAlignment="Center" HorizontalAlignment="Left" 
+                                   Margin="15,0,0,0" FontWeight="Bold" Foreground="White" FontSize="12"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
+                            <Button x:Name="MinimizeBtn" Content="─" Width="30" Height="30" 
+                                    Style="{StaticResource WindowButton}" Click="Minimize_Click"/>
+                            <Button x:Name="CloseBtn" Content="✕" Width="30" Height="30" 
+                                    Style="{StaticResource WindowButton}" Click="Close_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Основной контент -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="20">
+
+                        <!-- Статус подключения -->
+                        <Border Background="#2D2D44" CornerRadius="15" Padding="20" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Width="55" Height="55" CornerRadius="27.5"
+                                        Background="{Binding State, Converter={StaticResource StateToColor}}"
+                                        Margin="0,0,15,0">
+                                    <TextBlock Text="{Binding State, Converter={StaticResource StateToIcon}}" 
+                                               FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding State, Converter={StaticResource StateToText}}" 
+                                               FontSize="18" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding ConnectionTime}" Foreground="#888" FontSize="12" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Информация о подключении -->
+                        <Border Background="#2D2D44" CornerRadius="15" Padding="20" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="ИНФОРМАЦИЯ" FontWeight="Bold" Foreground="#6C6C8A" Margin="0,0,0,15"/>
+
+                                <Grid Grid.Row="1" Margin="0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="IP адрес:" Foreground="#AAA"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding LocalIp}" Foreground="White" FontWeight="SemiBold"/>
+                                </Grid>
+
+                                <Grid Grid.Row="2" Margin="0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Сервер:" Foreground="#AAA"/>
+                                    <TextBlock Grid.Column="1" Foreground="White" FontWeight="SemiBold">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}:{1}">
+                                                <Binding Path="ServerAddress"/>
+                                                <Binding Path="ServerPort"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- Статистика трафика -->
+                        <Border Background="#2D2D44" CornerRadius="15" Padding="20" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="СТАТИСТИКА" FontWeight="Bold" Foreground="#6C6C8A" Margin="0,0,0,15"/>
+
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Background="#1A1A2E" CornerRadius="10" Padding="15" Margin="0,0,10,0">
+                                        <StackPanel>
+                                            <TextBlock Text="ЗАГРУЗКА" FontSize="11" Foreground="#6C6C8A"/>
+                                            <TextBlock Text="{Binding DownloadSpeed}" FontSize="22" FontWeight="Bold" Foreground="#4CAF50"/>
+                                            <TextBlock Text="{Binding TotalData}" FontSize="10" Foreground="#888" Margin="0,5,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="1" Background="#1A1A2E" CornerRadius="10" Padding="15">
+                                        <StackPanel>
+                                            <TextBlock Text="ОТПРАВКА" FontSize="11" Foreground="#6C6C8A"/>
+                                            <TextBlock Text="{Binding UploadSpeed}" FontSize="22" FontWeight="Bold" Foreground="#2196F3"/>
+                                            <TextBlock Text="{Binding Ping}" FontSize="10" Foreground="#888" Margin="0,5,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- Кнопки управления -->
+                        <WrapPanel HorizontalAlignment="Center" Margin="0,0,0,20">
+                            <Button Content="ПОДКЛЮЧИТЬ" Width="150" Height="48" 
+                                    Style="{StaticResource ConnectButton}" Command="{Binding ConnectCommand}"/>
+                            <Button Content="ОТКЛЮЧИТЬ" Width="150" Height="48" 
+                                    Style="{StaticResource DisconnectButton}" Command="{Binding DisconnectCommand}"/>
+                        </WrapPanel>
+
+                        <!-- Лог событий -->
+                        <Border Background="#1A1A2E" CornerRadius="15" Padding="15" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="130"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="ЛОГ СОБЫТИЙ" FontWeight="Bold" Foreground="#6C6C8A" Margin="0,0,0,10"/>
+
+                                <ListBox Grid.Row="1" Background="Transparent" BorderThickness="0"
+                                         ItemsSource="{Binding Logs}" FontFamily="Consolas" FontSize="11">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Foreground="#00FF00" TextWrapping="Wrap" Margin="0,3"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Статус бар -->
+                <Border Grid.Row="2" Background="#25253A" CornerRadius="0,0,20,20" Padding="12">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="Защищено" Foreground="#4CAF50" FontSize="11" FontWeight="Bold"/>
+                        <TextBlock Text="| AES-256-GCM" Foreground="#6C6C8A" FontSize="11" Margin="10,0,0,0"/>
+                        <TextBlock Text="| UDP" Foreground="#6C6C8A" FontSize="11" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

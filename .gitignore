@@ -1,0 +1,46 @@
+# Создайте файл .gitignore
+cat > .gitignore << 'EOF'
+## Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Build results
+bin/
+obj/
+Debug/
+Release/
+*.exe
+*.dll
+*.pdb
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+
+## VS Code
+.vscode/
+
+## Rider
+.idea/
+
+## Logs
+*.log
+logs/
+
+## Configuration
+appsettings.Development.json
+bot_config.json
+
+## OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+EOF
+
+# Затем добавьте всё, кроме .vs
+git add .
+git commit -m "Initial commit"

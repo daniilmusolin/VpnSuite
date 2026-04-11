@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "VpnServer": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
