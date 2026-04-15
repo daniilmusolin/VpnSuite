@@ -1,24 +1,97 @@
-﻿<Window x:Class="VpnClient.Views.MainWindow"
+﻿<Window x:Class="VpnClientWPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:converters="clr-namespace:VpnClient.Converters"
-        xmlns:vm="clr-namespace:VpnClient.ViewModels"
+        xmlns:vm="clr-namespace:VpnClientWPF.ViewModels"
         Title="ULTRA VPN" Height="700" Width="520"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent">
 
     <Window.Resources>
-        <converters:StateToColorConverter x:Key="StateToColor"/>
-        <converters:StateToIconConverter x:Key="StateToIcon"/>
-        <converters:StateToTextConverter x:Key="StateToText"/>
+        <vm:MainViewModel x:Key="MainViewModel"/>
+
+        <!-- Стиль для кнопок -->
+        <Style x:Key="WindowButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#444"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ConnectButton" TargetType="Button">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="25" Padding="15,12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#66BB6A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#388E3C"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#555"/>
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DisconnectButton" TargetType="Button">
+            <Setter Property="Background" Value="#F44336"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="25" Padding="15,12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#EF5350"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#C62828"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#555"/>
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
-    <Grid>
-        <Grid.DataContext>
-            <vm:MainViewModel/>
-        </Grid.DataContext>
-
+    <Grid DataContext="{Binding Source={StaticResource MainViewModel}}">
         <Border CornerRadius="20" Background="#1A1A2E" Margin="10">
             <Border.Effect>
                 <DropShadowEffect Color="Black" BlurRadius="15" Opacity="0.4"/>
@@ -57,19 +130,49 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-
                                 <Border Width="55" Height="55" CornerRadius="27.5"
-                                        Background="{Binding State, Converter={StaticResource StateToColor}}"
-                                        Margin="0,0,15,0">
-                                    <TextBlock Text="{Binding State, Converter={StaticResource StateToIcon}}" 
-                                               FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        Background="{Binding StateColor}" Margin="0,0,15,0">
+                                    <TextBlock Text="{Binding StateIcon}" FontSize="28" 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
-
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{Binding State, Converter={StaticResource StateToText}}" 
-                                               FontSize="18" FontWeight="Bold" Foreground="White"/>
-                                    <TextBlock Text="{Binding ConnectionTime}" Foreground="#888" FontSize="12" Margin="0,5,0,0"/>
+                                    <TextBlock Text="{Binding StateText}" FontSize="18" 
+                                               FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="{Binding ConnectionTime}" Foreground="#888" 
+                                               FontSize="12" Margin="0,5,0,0"/>
                                 </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Настройки сервера -->
+                        <Border Background="#2D2D44" CornerRadius="15" Padding="20" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="НАСТРОЙКИ СЕРВЕРА" FontWeight="Bold" Foreground="#6C6C8A" Margin="0,0,0,15"/>
+                                <Grid Grid.Row="1" Margin="0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Адрес:" Foreground="#AAA"/>
+                                    <TextBox Grid.Column="1" Text="{Binding ServerAddress, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="#1A1A2E" Foreground="White" BorderBrush="#444"
+                                             Padding="8" Margin="5,0,0,0"/>
+                                </Grid>
+                                <Grid Grid.Row="2" Margin="0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Порт:" Foreground="#AAA"/>
+                                    <TextBox Grid.Column="1" Text="{Binding ServerPort, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="#1A1A2E" Foreground="White" BorderBrush="#444"
+                                             Padding="8" Margin="5,0,0,0"/>
+                                </Grid>
                             </Grid>
                         </Border>
 
@@ -81,9 +184,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-
                                 <TextBlock Text="ИНФОРМАЦИЯ" FontWeight="Bold" Foreground="#6C6C8A" Margin="0,0,0,15"/>
-
                                 <Grid Grid.Row="1" Margin="0,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="100"/>
@@ -92,7 +193,6 @@
                                     <TextBlock Text="IP адрес:" Foreground="#AAA"/>
                                     <TextBlock Grid.Column="1" Text="{Binding LocalIp}" Foreground="White" FontWeight="SemiBold"/>
                                 </Grid>
-
                                 <Grid Grid.Row="2" Margin="0,5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="100"/>
@@ -118,27 +218,25 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-
                                 <TextBlock Text="СТАТИСТИКА" FontWeight="Bold" Foreground="#6C6C8A" Margin="0,0,0,15"/>
-
                                 <Grid Grid.Row="1">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-
                                     <Border Background="#1A1A2E" CornerRadius="10" Padding="15" Margin="0,0,10,0">
                                         <StackPanel>
                                             <TextBlock Text="ЗАГРУЗКА" FontSize="11" Foreground="#6C6C8A"/>
-                                            <TextBlock Text="{Binding DownloadSpeed}" FontSize="22" FontWeight="Bold" Foreground="#4CAF50"/>
+                                            <TextBlock Text="{Binding DownloadSpeed}" FontSize="22" 
+                                                       FontWeight="Bold" Foreground="#4CAF50"/>
                                             <TextBlock Text="{Binding TotalData}" FontSize="10" Foreground="#888" Margin="0,5,0,0"/>
                                         </StackPanel>
                                     </Border>
-
                                     <Border Grid.Column="1" Background="#1A1A2E" CornerRadius="10" Padding="15">
                                         <StackPanel>
                                             <TextBlock Text="ОТПРАВКА" FontSize="11" Foreground="#6C6C8A"/>
-                                            <TextBlock Text="{Binding UploadSpeed}" FontSize="22" FontWeight="Bold" Foreground="#2196F3"/>
+                                            <TextBlock Text="{Binding UploadSpeed}" FontSize="22" 
+                                                       FontWeight="Bold" Foreground="#2196F3"/>
                                             <TextBlock Text="{Binding Ping}" FontSize="10" Foreground="#888" Margin="0,5,0,0"/>
                                         </StackPanel>
                                     </Border>
@@ -149,9 +247,11 @@
                         <!-- Кнопки управления -->
                         <WrapPanel HorizontalAlignment="Center" Margin="0,0,0,20">
                             <Button Content="ПОДКЛЮЧИТЬ" Width="150" Height="48" 
-                                    Style="{StaticResource ConnectButton}" Command="{Binding ConnectCommand}" Margin="0,0,5,0"/>
+                                    Style="{StaticResource ConnectButton}" Command="{Binding ConnectCommand}" 
+                                    Margin="0,0,5,0"/>
                             <Button Content="ОТКЛЮЧИТЬ" Width="150" Height="48" 
-                                    Style="{StaticResource DisconnectButton}" Command="{Binding DisconnectCommand}" Margin="5,0,0,0"/>
+                                    Style="{StaticResource DisconnectButton}" Command="{Binding DisconnectCommand}" 
+                                    Margin="5,0,0,0"/>
                         </WrapPanel>
 
                         <!-- Лог событий -->
@@ -159,13 +259,12 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="130"/>
+                                    <RowDefinition Height="150"/>
                                 </Grid.RowDefinitions>
-
                                 <TextBlock Text="ЛОГ СОБЫТИЙ" FontWeight="Bold" Foreground="#6C6C8A" Margin="0,0,0,10"/>
-
                                 <ListBox Grid.Row="1" Background="Transparent" BorderThickness="0"
-                                         ItemsSource="{Binding Logs}" FontFamily="Consolas" FontSize="11">
+                                         ItemsSource="{Binding Logs}" FontFamily="Consolas" FontSize="11"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding}" Foreground="#00FF00" TextWrapping="Wrap" Margin="0,3"/>

@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VpnCore", "VpnCore\VpnCore.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VpnBot", "VpnBot\VpnBot.csproj", "{440ED04A-A6B8-4DF2-8204-E82C1DE3EB9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VpnClient", "VpnClient\VpnClient.csproj", "{9E51BF82-BE58-420A-BCC3-8AA4C5E25A15}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VpnClientWPF", "VpnClientWPF\VpnClientWPF.csproj", "{88F4FEC8-6EC1-441F-AD7F-A03402A0C367}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{440ED04A-A6B8-4DF2-8204-E82C1DE3EB9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{440ED04A-A6B8-4DF2-8204-E82C1DE3EB9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{440ED04A-A6B8-4DF2-8204-E82C1DE3EB9F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9E51BF82-BE58-420A-BCC3-8AA4C5E25A15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E51BF82-BE58-420A-BCC3-8AA4C5E25A15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E51BF82-BE58-420A-BCC3-8AA4C5E25A15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E51BF82-BE58-420A-BCC3-8AA4C5E25A15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88F4FEC8-6EC1-441F-AD7F-A03402A0C367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88F4FEC8-6EC1-441F-AD7F-A03402A0C367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88F4FEC8-6EC1-441F-AD7F-A03402A0C367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88F4FEC8-6EC1-441F-AD7F-A03402A0C367}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

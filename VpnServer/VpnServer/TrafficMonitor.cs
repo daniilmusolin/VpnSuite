@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 using VpnCore.Utils;
 
 namespace VpnServer {
@@ -109,10 +105,10 @@ namespace VpnServer {
             var totalSpeedReceived = _trafficStats.Values.Sum(s => s.CurrentReceiveSpeed);
 
             Console.WriteLine($@"
-╠══════════════════════════════════════════════════════════════════════════════╣
-║ TOTAL          │ {(totalSpeedReceived / 1024.0):F1} KB/s │ {(totalSpeedSent / 1024.0):F1} KB/s │ {(totalReceived / (1024.0 * 1024)):F1} MB │ {(totalSent / (1024.0 * 1024)):F1} MB ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-");
+                ╠══════════════════════════════════════════════════════════════════════════════╣
+                ║ TOTAL          │ {(totalSpeedReceived / 1024.0):F1} KB/s │ {(totalSpeedSent / 1024.0):F1} KB/s │ {(totalReceived / (1024.0 * 1024)):F1} MB │ {(totalSent / (1024.0 * 1024)):F1} MB ║
+                ╚══════════════════════════════════════════════════════════════════════════════╝
+                ");
 
             // Отправляем отчет
             var report = new TrafficReport {

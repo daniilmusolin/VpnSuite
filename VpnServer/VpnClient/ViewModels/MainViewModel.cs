@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
@@ -63,32 +62,6 @@ namespace VpnClient.ViewModels {
             set {
                 _state = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(StateText));
-                OnPropertyChanged(nameof(StateIcon));
-            }
-        }
-
-        public string StateText {
-            get {
-                switch (State) {
-                    case ConnectionState.Connected: return "ПОДКЛЮЧЁН";
-                    case ConnectionState.Connecting: return "ПОДКЛЮЧЕНИЕ";
-                    case ConnectionState.Handshaking: return "РУКОПОЖАТИЕ";
-                    case ConnectionState.Disconnected: return "ОТКЛЮЧЁН";
-                    case ConnectionState.Disconnecting: return "ОТКЛЮЧЕНИЕ";
-                    default: return "ОШИБКА";
-                }
-            }
-        }
-
-        public string StateIcon {
-            get {
-                switch (State) {
-                    case ConnectionState.Connected: return "🟢";
-                    case ConnectionState.Connecting: return "🟡";
-                    case ConnectionState.Handshaking: return "🔵";
-                    default: return "🔴";
-                }
             }
         }
 
@@ -168,8 +141,8 @@ namespace VpnClient.ViewModels {
             return $"{bytes} B";
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null) {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? name = null) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }

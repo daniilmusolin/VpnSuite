@@ -12,7 +12,7 @@ namespace VpnClient.Services {
         private double _currentUploadSpeed;
         private readonly System.Timers.Timer _timer;
 
-        public event Action<double, double, long, long> OnUpdate;
+        public event Action<double, double, long, long>? OnUpdate;
 
         public TrafficService() {
             _timer = new System.Timers.Timer(1000);
@@ -27,7 +27,7 @@ namespace VpnClient.Services {
                 Interlocked.Add(ref _totalUpload, bytes);
         }
 
-        private void UpdateSpeed(object sender, ElapsedEventArgs e) {
+        private void UpdateSpeed(object? sender, ElapsedEventArgs e) {
             var currentDownload = _totalDownload;
             var currentUpload = _totalUpload;
 
