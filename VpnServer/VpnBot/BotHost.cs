@@ -1,55 +1,52 @@
-﻿//using System;
-//using System.Threading;
-//using System.Threading.Tasks;
-//using Microsoft.Extensions.Hosting;
-//using Microsoft.Extensions.Logging;
-//using Telegram.Bot;
-//using Telegram.Bot.Polling;
-//using Telegram.Bot.Types.Enums;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Telegram.Bot;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types.Enums;
 
-//namespace VpnBot {
-//    public class BotHost : IHostedService {
-//        private readonly BotConfig _config;
-//        private readonly BotHandlers _handlers;
-//        private readonly ILogger<BotHost> _logger;
-//        private ITelegramBotClient _botClient;
-//        private CancellationTokenSource _cts;
+namespace VpnBot;
 
-//        public BotHost(BotConfig config, BotHandlers handlers, ILogger<BotHost> logger) {
-//            _config = config;
-//            _handlers = handlers;
-//            _logger = logger;
-//        }
+public class BotHost : IHostedService {
+    private readonly BotConfig _config;
+    private readonly BotHandlers _handlers;
+    private readonly ILogger<BotHost> _logger;
+    private ITelegramBotClient? _botClient;
+    private CancellationTokenSource? _cts;
 
-//        public async Task StartAsync(CancellationToken cancellationToken) {
-//            _logger.LogInformation("Запуск Telegram бота...");
+    public BotHost(BotConfig config, BotHandlers handlers, ILogger<BotHost> logger) {
+        _config = config;
+        _handlers = handlers;
+        _logger = logger;
+    }
 
-//            _botClient = new TelegramBotClient(_config.BotToken);
-//            _cts = new CancellationTokenSource();
+    public async Task StartAsync(CancellationToken cancellationToken) {
+        _logger.LogInformation("Запуск Telegram бота...");
 
-//            var botInfo = await _botClient.GetMeAsync(cancellationToken);
-//            _logger.LogInformation($"Бот запущен: @{botInfo.Username}");
+        _botClient = new TelegramBotClient(_config.BotToken);
+        _cts = new CancellationTokenSource();
 
-//            var receiverOptions = new ReceiverOptions {
-//                AllowedUpdates = new[] { UpdateType.Message, UpdateType.CallbackQuery }
-//            };
+        var botInfo = await _botClient.GetMeAsync(cancellationToken);
+        _logger.LogInformation($"Бот запущен: @{botInfo.Username}");
 
-//            _botClient.StartReceiving(
-//                _handlers.HandleUpdateAsync,
-//                _handlers.HandleErrorAsync,
-//                receiverOptions,
-//                _cts.Token
-//            );
+        var receiverOptions = new ReceiverOptions {
+            AllowedUpdates = new[] { UpdateType.Message, UpdateType.CallbackQuery }
+        };
 
-//            _logger.LogInformation("Бот готов к работе!");
-//        }
+        _botClient.StartReceiving(
+            _handlers.HandleUpdateAsync,
+            _handlers.HandleErrorAsync,
+            receiverOptions,
+            _cts.Token
+        );
 
-//        public async Task StopAsync(CancellationToken cancellationToken) {
-//            _logger.LogInformation("Остановка бота...");
-//            _cts.Cancel();
-//            await Task.CompletedTask;
-//        }
+        _logger.LogInformation("Бот готов к работе!");
+    }
 
-//        public ITelegramBotClient GetBotClient() => _botClient;
-//    }
-//}
+    public async Task StopAsync(CancellationToken cancellationToken) {
+        _logger.LogInformation("Остановка бота...");
+        _cts?.Cancel();
+        await Task.CompletedTask;
+    }
+
+    public ITelegramBotClient GetBotClient() => _botClient ?? throw new InvalidOperationException("Bot not started");
+}

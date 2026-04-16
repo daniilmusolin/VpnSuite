@@ -1,0 +1,19 @@
+﻿{
+  "ListenAddress": "0.0.0.0",
+  "ListenPort": 51820,
+  "VirtualNetwork": "10.8.0.0",
+  "VirtualNetworkMask": 24,
+  "MaxClients": 100,
+  "MaxPacketSize": 1400,
+  "Mtu": 1400,
+  "HandshakeTimeoutSeconds": 10,
+  "KeepAliveIntervalSeconds": 25,
+  "SessionTimeoutSeconds": 300,
+  "CipherSuite": "AES-256-GCM",
+  "HandshakeProtocol": "Noise_IK",
+  "RequireAuthentication": true,
+  "EnableDetailedLogging": false,
+  "LogLevel": "Info",
+  "EnableNatTraversal": true,
+  "EnableCompression": false
+}

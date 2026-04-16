@@ -1,28 +1,34 @@
-# См. статью по ссылке https://aka.ms/customizecontainer, чтобы узнать как настроить контейнер отладки и как Visual Studio использует этот Dockerfile для создания образов для ускорения отладки.
-
-# Этот этап используется при запуске из VS в быстром режиме (по умолчанию для конфигурации отладки)
-FROM mcr.microsoft.com/dotnet/runtime:9.0 AS base
-USER $APP_UID
-WORKDIR /app
-
-
-# Этот этап используется для сборки проекта службы
+# Этап 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["VpnServer/VpnServer.csproj", "VpnServer/"]
-RUN dotnet restore "./VpnServer/VpnServer.csproj"
+
+# Копируем csproj и восстанавливаем зависимости
+COPY VpnServer.csproj .
+RUN dotnet restore
+
+# Копируем весь код и собираем
 COPY . .
-WORKDIR "/src/VpnServer"
-RUN dotnet build "./VpnServer.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet publish -c Release -o /app/publish
 
-# Этот этап используется для публикации проекта службы, который будет скопирован на последний этап
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./VpnServer.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
-FROM base AS final
+# Этап 2: Runtime
+FROM mcr.microsoft.com/dotnet/runtime:9.0 AS runtime
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Устанавливаем необходимые пакеты для сети
+RUN apt-get update && apt-get install -y \
+    iproute2 \
+    iptables \
+    && rm -rf /var/lib/apt/lists/*
+
+# Копируем собранное приложение
+COPY --from=build /app/publish .
+
+# Создаем директории для данных
+RUN mkdir -p /app/config /app/logs
+
+# Открываем порты
+EXPOSE 51820/udp  # VPN порт
+EXPOSE 5000/tcp   # API порт
+
+# Запускаем приложение
 ENTRYPOINT ["dotnet", "VpnServer.dll"]

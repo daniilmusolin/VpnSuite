@@ -1,60 +1,68 @@
-﻿//using System.Threading;
-//using System.Threading.Tasks;
-//using Microsoft.Extensions.DependencyInjection;
-//using Telegram.Bot;
-//using Telegram.Bot.Types;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
-//namespace VpnBot.Commands {
-//    public class BanCommand : ICommand {
-//        public string Name => "/ban";
-//        public string Description => "Ban a client (usage: /ban CLIENT_ID)";
+namespace VpnBot.Commands;
 
-//        private readonly IServiceProvider _services;
+public class KickCommand : ICommand {
+    public string Name => "/kick";
+    public string Description => "Отключить клиента (использование: /kick CLIENT_ID)";
 
-//        public BanCommand(IServiceProvider services) {
-//            _services = services;
-//        }
+    private readonly IServiceProvider _services;
 
-//        public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
-//            var vpnApi = _services.GetRequiredService<VpnApiClient>();
-//            var userManager = _services.GetRequiredService<UserManager>();
+    public KickCommand(IServiceProvider services) {
+        _services = services;
+    }
 
-//            userManager.UpdateActivity(message.From.Id);
+    public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
+        var vpnApi = _services.GetRequiredService<VpnApiClient>();
+        var userManager = _services.GetRequiredService<UserManager>();
+        var userId = message.From?.Id ?? 0;
 
-//            var parts = message.Text.Split(' ');
-//            if (parts.Length < 2) {
-//                await botClient.SendTextMessageAsync(
-//                    message.Chat.Id,
-//                    "❌ Usage: `/ban CLIENT_ID`\n\nUse `/clients` to see available client IDs.",
-//                    ParseMode.Markdown,
-//                    cancellationToken: cancellationToken);
-//                return;
-//            }
+        userManager.UpdateActivity(userId);
 
-//            var clientId = parts[1];
+        if (!userManager.CanKick(userId)) {
+            await botClient.SendTextMessageAsync(
+                message.Chat.Id,
+                "⛔ У вас нет прав на отключение клиентов",
+                cancellationToken: cancellationToken);
+            return;
+        }
 
-//            try {
-//                var result = await vpnApi.BanClientAsync(clientId);
+        var parts = message.Text?.Split(' ') ?? Array.Empty<string>();
+        if (parts.Length < 2) {
+            await botClient.SendTextMessageAsync(
+                message.Chat.Id,
+                "❌ Использование: `/kick CLIENT_ID`\n\nИспользуйте `/clients` для просмотра ID клиентов.",
+                parseMode: ParseMode.Markdown,
+                cancellationToken: cancellationToken);
+            return;
+        }
 
-//                if (result) {
-//                    await botClient.SendTextMessageAsync(
-//                        message.Chat.Id,
-//                        $"✅ Client `{clientId}` has been banned successfully.",
-//                        ParseMode.Markdown,
-//                        cancellationToken: cancellationToken);
-//                } else {
-//                    await botClient.SendTextMessageAsync(
-//                        message.Chat.Id,
-//                        $"❌ Failed to ban client `{clientId}`. Client may not exist.",
-//                        ParseMode.Markdown,
-//                        cancellationToken: cancellationToken);
-//                }
-//            } catch (Exception ex) {
-//                await botClient.SendTextMessageAsync(
-//                    message.Chat.Id,
-//                    $"❌ Error: {ex.Message}",
-//                    cancellationToken: cancellationToken);
-//            }
-//        }
-//    }
-//}
+        var clientId = parts[1];
+
+        try {
+            var result = await vpnApi.KickClientAsync(clientId);
+
+            if (result) {
+                await botClient.SendTextMessageAsync(
+                    message.Chat.Id,
+                    $"✅ Клиент `{clientId}` отключен",
+                    parseMode: ParseMode.Markdown,
+                    cancellationToken: cancellationToken);
+            } else {
+                await botClient.SendTextMessageAsync(
+                    message.Chat.Id,
+                    $"❌ Не удалось отключить клиента `{clientId}`. Возможно, клиент не существует.",
+                    parseMode: ParseMode.Markdown,
+                    cancellationToken: cancellationToken);
+            }
+        } catch (Exception ex) {
+            await botClient.SendTextMessageAsync(
+                message.Chat.Id,
+                $"❌ Ошибка: {ex.Message}",
+                cancellationToken: cancellationToken);
+        }
+    }
+}

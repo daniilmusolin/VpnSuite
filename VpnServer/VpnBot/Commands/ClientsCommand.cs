@@ -1,87 +1,97 @@
-﻿//using System;
-//using System.Linq;
-//using System.Text;
-//using System.Threading;
-//using System.Threading.Tasks;
-//using Microsoft.Extensions.DependencyInjection;
-//using Telegram.Bot;
-//using Telegram.Bot.Types;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Text;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
-//namespace VpnBot.Commands {
-//    public class ClientsCommand : ICommand {
-//        public string Name => "/clients";
-//        public string Description => "Show active VPN clients";
+namespace VpnBot.Commands;
 
-//        private readonly IServiceProvider _services;
+public class ClientsCommand : ICommand {
+    public string Name => "/clients";
+    public string Description => "Список активных клиентов";
 
-//        public ClientsCommand(IServiceProvider services) {
-//            _services = services;
-//        }
+    private readonly IServiceProvider _services;
 
-//        public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
-//            var vpnApi = _services.GetRequiredService<VpnApiClient>();
-//            var userManager = _services.GetRequiredService<UserManager>();
+    public ClientsCommand(IServiceProvider services) {
+        _services = services;
+    }
 
-//            userManager.UpdateActivity(message.From.Id);
+    public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
+        var vpnApi = _services.GetRequiredService<VpnApiClient>();
+        var userManager = _services.GetRequiredService<UserManager>();
+        var userId = message.From?.Id ?? 0;
 
-//            try {
-//                var clients = await vpnApi.GetClientsAsync();
+        userManager.UpdateActivity(userId);
 
-//                if (!clients.Any()) {
-//                    await botClient.SendTextMessageAsync(
-//                        message.Chat.Id,
-//                        "📭 *No active clients*",
-//                        ParseMode.Markdown,
-//                        cancellationToken: cancellationToken);
-//                    return;
-//                }
+        try {
+            var clients = await vpnApi.GetClientsAsync();
 
-//                var sb = new StringBuilder();
-//                sb.AppendLine($"👥 *Active Clients ({clients.Count})*\n");
+            if (!clients.Any()) {
+                await botClient.SendTextMessageAsync(
+                    message.Chat.Id,
+                    "📭 *Нет активных клиентов*",
+                    parseMode: ParseMode.Markdown,
+                    cancellationToken: cancellationToken);
+                return;
+            }
 
-//                var buttons = new List<List<InlineKeyboardButton>>();
+            var sb = new StringBuilder();
+            sb.AppendLine($"👥 *Активные клиенты ({clients.Count})*\n");
 
-//                foreach (var client in clients) {
-//                    sb.AppendLine($"• *{client.ClientId}*");
-//                    sb.AppendLine($"  🌐 IP: {client.VirtualIp ?? "N/A"}");
-//                    sb.AppendLine($"  📥 ↓ {FormatBytes(client.BytesReceived)} | 📤 ↑ {FormatBytes(client.BytesSent)}");
-//                    sb.AppendLine($"  📦 Packets: {client.PacketsReceived}/{client.PacketsSent}");
-//                    sb.AppendLine($"  ⏱️ Last active: {client.LastActivity:HH:mm:ss}");
-//                    sb.AppendLine();
+            // Создаем список рядов кнопок
+            var buttons = new List<List<InlineKeyboardButton>>();
 
-//                    buttons.Add(new[]
-//                    {
-//                        InlineKeyboardButton.WithCallbackData($"🔨 Kick {client.ClientId}", $"kick_{client.ClientId}"),
-//                        InlineKeyboardButton.WithCallbackData($"🚫 Ban {client.ClientId}", $"ban_{client.ClientId}")
-//                    });
-//                }
+            foreach (var client in clients) {
+                var totalMB = (client.BytesSent + client.BytesReceived) / (1024.0 * 1024);
 
-//                buttons.Add(new[] { InlineKeyboardButton.WithCallbackData("🔄 Refresh", "refresh_clients") });
+                sb.AppendLine($"• *{client.ClientId}*");
+                sb.AppendLine($"  🌐 IP: {client.VirtualIp ?? "N/A"}");
+                sb.AppendLine($"  📥 ↓ {FormatBytes(client.BytesReceived)} | 📤 ↑ {FormatBytes(client.BytesSent)}");
+                sb.AppendLine($"  📊 Всего: {totalMB:F1} MB");
+                sb.AppendLine($"  ⏱️ Активность: {client.LastActivity:HH:mm:ss}");
+                sb.AppendLine();
 
-//                var keyboard = new InlineKeyboardMarkup(buttons);
+                // Добавляем кнопки для каждого клиента
+                if (userManager.CanKick(userId)) {
+                    var row = new List<InlineKeyboardButton>
+                    {
+                        InlineKeyboardButton.WithCallbackData($"🔨 Кик {client.ClientId}", $"kick_{client.ClientId}"),
+                        InlineKeyboardButton.WithCallbackData($"🚫 Бан {client.ClientId}", $"ban_{client.ClientId}")
+                    };
+                    buttons.Add(row);
+                }
+            }
 
-//                await botClient.SendTextMessageAsync(
-//                    message.Chat.Id,
-//                    sb.ToString(),
-//                    ParseMode.Markdown,
-//                    replyMarkup: keyboard,
-//                    cancellationToken: cancellationToken);
-//            } catch (Exception ex) {
-//                await botClient.SendTextMessageAsync(
-//                    message.Chat.Id,
-//                    $"❌ Failed to get clients: {ex.Message}",
-//                    cancellationToken: cancellationToken);
-//            }
-//        }
+            // Добавляем кнопку обновления
+            buttons.Add(new List<InlineKeyboardButton>
+            {
+                InlineKeyboardButton.WithCallbackData("🔄 Обновить", "refresh_clients")
+            });
 
-//        private string FormatBytes(long bytes) {
-//            if (bytes >= 1024 * 1024 * 1024)
-//                return $"{bytes / (1024.0 * 1024 * 1024):F1} GB";
-//            if (bytes >= 1024 * 1024)
-//                return $"{bytes / (1024.0 * 1024):F1} MB";
-//            if (bytes >= 1024)
-//                return $"{bytes / 1024.0:F1} KB";
-//            return $"{bytes} B";
-//        }
-//    }
-//}
+            var keyboard = new InlineKeyboardMarkup(buttons);
+
+            await botClient.SendTextMessageAsync(
+                message.Chat.Id,
+                sb.ToString(),
+                parseMode: ParseMode.Markdown,
+                replyMarkup: keyboard,
+                cancellationToken: cancellationToken);
+        } catch (Exception ex) {
+            await botClient.SendTextMessageAsync(
+                message.Chat.Id,
+                $"❌ Ошибка получения списка клиентов: {ex.Message}",
+                cancellationToken: cancellationToken);
+        }
+    }
+
+    private string FormatBytes(long bytes) {
+        if (bytes >= 1024L * 1024 * 1024)
+            return $"{bytes / (1024.0 * 1024 * 1024):F1} GB";
+        if (bytes >= 1024 * 1024)
+            return $"{bytes / (1024.0 * 1024):F1} MB";
+        if (bytes >= 1024)
+            return $"{bytes / 1024.0:F1} KB";
+        return $"{bytes} B";
+    }
+}

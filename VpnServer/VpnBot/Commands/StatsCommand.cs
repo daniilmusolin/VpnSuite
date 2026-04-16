@@ -1,83 +1,89 @@
-﻿//using System;
-//using System.Threading;
-//using System.Threading.Tasks;
-//using Microsoft.Extensions.DependencyInjection;
-//using Telegram.Bot;
-//using Telegram.Bot.Types;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
-//namespace VpnBot.Commands {
-//    public class StatsCommand : ICommand {
-//        public string Name => "/stats";
-//        public string Description => "Show VPN server statistics";
+namespace VpnBot.Commands;
 
-//        private readonly IServiceProvider _services;
+public class StatsCommand : ICommand {
+    public string Name => "/stats";
+    public string Description => "Статистика VPN сервера";
 
-//        public StatsCommand(IServiceProvider services) {
-//            _services = services;
-//        }
+    private readonly IServiceProvider _services;
 
-//        public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
-//            var vpnApi = _services.GetRequiredService<VpnApiClient>();
-//            var userManager = _services.GetRequiredService<UserManager>();
+    public StatsCommand(IServiceProvider services) {
+        _services = services;
+    }
 
-//            userManager.UpdateActivity(message.From.Id);
+    public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
+        var vpnApi = _services.GetRequiredService<VpnApiClient>();
+        var userManager = _services.GetRequiredService<UserManager>();
 
-//            try {
-//                var stats = await vpnApi.GetServerStatsAsync();
+        userManager.UpdateActivity(message.From?.Id ?? 0);
 
-//                var statusIcon = stats.IsRunning ? "🟢" : "🔴";
-//                var statusText = stats.IsRunning ? "Running" : "Stopped";
+        try {
+            var stats = await vpnApi.GetServerStatsAsync();
 
-//                var statsMessage = $@"
-//                    {statusIcon} *VPN Server Statistics*
+            var statusIcon = stats.IsRunning ? "🟢" : "🔴";
+            var statusText = stats.IsRunning ? "РАБОТАЕТ" : "ОСТАНОВЛЕН";
 
-//                    *Status:* {statusText}
-//                    *Active Clients:* {stats.ActiveClients}
-//                    *Total Download:* {FormatBytes(stats.TotalBytesReceived)}
-//                    *Total Upload:* {FormatBytes(stats.TotalBytesSent)}
-//                    *Current Download Speed:* {FormatSpeed(stats.CurrentReceiveSpeed)}
-//                    *Current Upload Speed:* {FormatSpeed(stats.CurrentSendSpeed)}
-//                    *Uptime:* {stats.Uptime ?? "N/A"}
-//                    *Encryption:* {stats.CipherSuite ?? "AES-256-GCM"}
+            var statsMessage = $@"
+                {statusIcon} *СТАТИСТИКА VPN СЕРВЕРА*
 
-//                    📅 *Last updated:* {DateTime.Now:HH:mm:ss}
-//                ";
+                ━━━━━━━━━━━━━━━━━━━━━━
+                📡 *Статус:* {statusText}
+                👥 *Активных клиентов:* {stats.ActiveClients}
+                ━━━━━━━━━━━━━━━━━━━━━━
 
-//                var inlineKeyboard = new InlineKeyboardMarkup(new[]
-//                {
-//                    new[] { InlineKeyboardButton.WithCallbackData("🔄 Refresh", "refresh_stats") }
-//                });
+                📥 *Загрузка:* {FormatBytes(stats.TotalBytesReceived)}
+                📤 *Отправка:* {FormatBytes(stats.TotalBytesSent)}
+                ━━━━━━━━━━━━━━━━━━━━━━
 
-//                await botClient.SendTextMessageAsync(
-//                    message.Chat.Id,
-//                    statsMessage,
-//                    ParseMode.Markdown,
-//                    replyMarkup: inlineKeyboard,
-//                    cancellationToken: cancellationToken);
-//            } catch (Exception ex) {
-//                await botClient.SendTextMessageAsync(
-//                    message.Chat.Id,
-//                    $"❌ Failed to get statistics: {ex.Message}",
-//                    cancellationToken: cancellationToken);
-//            }
-//        }
+                ⚡ *Скорость загрузки:* {FormatSpeed(stats.CurrentReceiveSpeed)}
+                ⚡ *Скорость отправки:* {FormatSpeed(stats.CurrentSendSpeed)}
+                ━━━━━━━━━━━━━━━━━━━━━━
 
-//        private string FormatBytes(long bytes) {
-//            if (bytes >= 1024 * 1024 * 1024)
-//                return $"{bytes / (1024.0 * 1024 * 1024):F1} GB";
-//            if (bytes >= 1024 * 1024)
-//                return $"{bytes / (1024.0 * 1024):F1} MB";
-//            if (bytes >= 1024)
-//                return $"{bytes / 1024.0:F1} KB";
-//            return $"{bytes} B";
-//        }
+                🔐 *Шифрование:* {stats.CipherSuite ?? "AES-256-GCM"}
+                📅 *Время работы:* {stats.Uptime ?? "N/A"}
 
-//        private string FormatSpeed(long bytesPerSecond) {
-//            if (bytesPerSecond >= 1024 * 1024)
-//                return $"{bytesPerSecond / (1024.0 * 1024):F1} MB/s";
-//            if (bytesPerSecond >= 1024)
-//                return $"{bytesPerSecond / 1024.0:F1} KB/s";
-//            return $"{bytesPerSecond} B/s";
-//        }
-//    }
-//}
+                🕐 *Обновлено:* {DateTime.Now:HH:mm:ss}
+                ";
+
+            var inlineKeyboard = new InlineKeyboardMarkup(new[]
+            {
+                new[] { InlineKeyboardButton.WithCallbackData("🔄 Обновить", "refresh_stats") }
+            });
+
+            await botClient.SendTextMessageAsync(
+                message.Chat.Id,
+                statsMessage,
+                parseMode: ParseMode.Markdown,
+                replyMarkup: inlineKeyboard,
+                cancellationToken: cancellationToken);
+        } catch (Exception ex) {
+            await botClient.SendTextMessageAsync(
+                message.Chat.Id,
+                $"❌ Ошибка получения статистики: {ex.Message}",
+                cancellationToken: cancellationToken);
+        }
+    }
+
+    private string FormatBytes(long bytes) {
+        if (bytes >= 1024L * 1024 * 1024)
+            return $"{bytes / (1024.0 * 1024 * 1024):F1} GB";
+        if (bytes >= 1024 * 1024)
+            return $"{bytes / (1024.0 * 1024):F1} MB";
+        if (bytes >= 1024)
+            return $"{bytes / 1024.0:F1} KB";
+        return $"{bytes} B";
+    }
+
+    private string FormatSpeed(long bytesPerSecond) {
+        if (bytesPerSecond >= 1024 * 1024)
+            return $"{bytesPerSecond / (1024.0 * 1024):F1} MB/s";
+        if (bytesPerSecond >= 1024)
+            return $"{bytesPerSecond / 1024.0:F1} KB/s";
+        return $"{bytesPerSecond} B/s";
+    }
+}

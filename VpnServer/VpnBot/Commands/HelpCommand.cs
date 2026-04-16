@@ -1,52 +1,55 @@
-﻿//using Microsoft.Extensions.DependencyInjection;
-//using Telegram.Bot;
-//using Telegram.Bot.Types;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Text;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using VpnBot.keyboards;
 
-//namespace VpnBot.Commands {
-//    public class HelpCommand : ICommand {
-//        public string Name => "/help";
-//        public string Description => "Show all available commands";
+namespace VpnBot.Commands;
 
-//        private readonly IServiceProvider _services;
+public class HelpCommand : ICommand {
+    public string Name => "/help";
+    public string Description => "Показать справку";
 
-//        public HelpCommand(IServiceProvider services) {
-//            _services = services;
-//        }
+    private readonly IServiceProvider _services;
 
-//        public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
-//            var userManager = _services.GetRequiredService<UserManager>();
-//            userManager.UpdateActivity(message.From.Id);
+    public HelpCommand(IServiceProvider services) {
+        _services = services;
+    }
 
-//            var helpMessage = @"
-//                🤖 *VPN Bot Help*
+    public async Task ExecuteAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
+        var userManager = _services.GetRequiredService<UserManager>();
+        var userId = message.From?.Id ?? 0;
+        var commands = _services.GetServices<ICommand>();
 
-//                *Available Commands:*
+        userManager.UpdateActivity(userId);
 
-//                /stats - 📊 View server statistics
-//                /clients - 👥 View connected clients
-//                /kick <client_id> - 🔨 Kick a client by ID
-//                /ban <client_id> - 🚫 Ban a client by ID
-//                /start - 🎉 Show welcome message
-//                /help - ❓ Show this help
+        var sb = new StringBuilder();
+        sb.AppendLine("🤖 *VPN Bot - Справка*");
+        sb.AppendLine();
+        sb.AppendLine("*Доступные команды:*");
+        sb.AppendLine();
 
-//                *Examples:*
-//                `/kick CLIENT_001`
-//                `/ban CLIENT_002`
+        foreach (var cmd in commands.OrderBy(c => c.Name)) {
+            sb.AppendLine($"`{cmd.Name}` - {cmd.Description}");
+        }
 
-//                *Quick Actions:*
-//                Use the buttons in the main menu for faster access.
+        sb.AppendLine();
+        sb.AppendLine("*Примеры:*");
+        sb.AppendLine("`/kick CLIENT_001` - отключить клиента");
+        sb.AppendLine("`/ban CLIENT_002` - заблокировать клиента");
+        sb.AppendLine("`/traffic CLIENT_003` - трафик клиента");
+        sb.AppendLine();
+        sb.AppendLine("*Быстрые действия:*");
+        sb.AppendLine("Используйте кнопки меню для быстрой навигации.");
 
-//                📌 *Note:* Some commands may be restricted to authorized users only.
-//                            ";
+        var keyboard = MainKeyboard.GetKeyboard();
 
-//            var keyboard = MainKeyboard.GetKeyboard();
-
-//            await botClient.SendTextMessageAsync(
-//                message.Chat.Id,
-//                helpMessage,
-//                ParseMode.Markdown,
-//                replyMarkup: keyboard,
-//                cancellationToken: cancellationToken);
-//        }
-//    }
-//}
+        await botClient.SendTextMessageAsync(
+            message.Chat.Id,
+            sb.ToString(),
+            parseMode: ParseMode.Markdown,
+            replyMarkup: keyboard,
+            cancellationToken: cancellationToken);
+    }
+}

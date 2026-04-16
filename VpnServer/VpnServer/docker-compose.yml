@@ -1,0 +1,49 @@
+﻿version: '3.8'
+
+services:
+  vpn-server:
+    build: .
+    container_name: vpn-server
+    restart: unless-stopped
+    network_mode: host  # Используем host network для UDP и TUN/TAP
+    privileged: true     # Нужен для создания TUN интерфейсов
+    volumes:
+      # Конфигурация
+      - ./config:/app/config:ro
+      # Логи
+      - ./logs:/app/logs
+      # Данные (API ключ, черный список)
+      - ./data:/app/data
+      # Проброс TUN устройства
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Опционально: мониторинг
+  vpn-monitor:
+    image: prom/node-exporter:latest
+    container_name: vpn-monitor
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+    profiles:
+      - monitoring
