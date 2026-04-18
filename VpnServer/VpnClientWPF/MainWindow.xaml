@@ -159,7 +159,7 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Адрес:" Foreground="#AAA"/>
-                                    <TextBox Grid.Column="1" Text="{Binding ServerAddress, UpdateSourceTrigger=PropertyChanged}"
+                                    <TextBox Grid.Column="1" Text="{Binding ServerAddress}"
                                              Background="#1A1A2E" Foreground="White" BorderBrush="#444"
                                              Padding="8" Margin="5,0,0,0"/>
                                 </Grid>
