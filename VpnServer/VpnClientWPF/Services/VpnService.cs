@@ -20,31 +20,31 @@ public class VpnService : IDisposable {
     public async Task<bool> ConnectAsync(string serverAddress, int port) {
         try {
             OnStateChanged?.Invoke(ConnectionState.Connecting, "");
-            OnLog?.Invoke($"🔌 Подключение к {serverAddress}:{port}...");
+            OnLog?.Invoke($"Подключение к {serverAddress}:{port}...");
 
             _udpClient = new UdpClient();
 
-            OnLog?.Invoke($"📤 Отправка HELLO серверу...");
+            OnLog?.Invoke($"Отправка HELLO серверу...");
             byte[] helloMsg = Encoding.UTF8.GetBytes("VPN_CLIENT_HELLO");
             await _udpClient.SendAsync(helloMsg, helloMsg.Length, serverAddress, port);
 
-            OnLog?.Invoke($"📥 Ожидание ответа от сервера...");
+            OnLog?.Invoke($"Ожидание ответа от сервера...");
             using var cts = new CancellationTokenSource(5000);
             var receiveTask = _udpClient.ReceiveAsync(cts.Token);
             var completedTask = await Task.WhenAny(receiveTask.AsTask(), Task.Delay(5000));
 
             if (completedTask != receiveTask.AsTask()) {
-                OnLog?.Invoke($"❌ Таймаут! Сервер не ответил");
+                OnLog?.Invoke($"Таймаут! Сервер не ответил");
                 OnStateChanged?.Invoke(ConnectionState.Error, "");
                 return false;
             }
 
             var result = await receiveTask;
             string response = Encoding.UTF8.GetString(result.Buffer);
-            OnLog?.Invoke($"📥 Получен ответ: {response}");
+            OnLog?.Invoke($"Получен ответ: {response}");
 
             if (response != "VPN_SERVER_HELLO") {
-                OnLog?.Invoke($"❌ Неверный ответ от сервера");
+                OnLog?.Invoke($"Неверный ответ от сервера");
                 OnStateChanged?.Invoke(ConnectionState.Error, "");
                 return false;
             }
@@ -53,19 +53,19 @@ public class VpnService : IDisposable {
             _virtualIp = "10.8.0.2";
 
             OnStateChanged?.Invoke(ConnectionState.Connected, _virtualIp);
-            OnLog?.Invoke($"✅ ПОДКЛЮЧЕНО к {serverAddress}:{port}!");
-            OnLog?.Invoke($"🔒 Виртуальный IP: {_virtualIp}");
+            OnLog?.Invoke($"ПОДКЛЮЧЕНО к {serverAddress}:{port}!");
+            OnLog?.Invoke($"Виртуальный IP: {_virtualIp}");
 
             StartKeepAlive(serverAddress, port);
             StartTrafficSimulation();
 
             return true;
         } catch (SocketException ex) {
-            OnLog?.Invoke($"❌ Ошибка сокета: {ex.Message}");
+            OnLog?.Invoke($"Ошибка сокета: {ex.Message}");
             OnStateChanged?.Invoke(ConnectionState.Error, "");
             return false;
         } catch (Exception ex) {
-            OnLog?.Invoke($"❌ Ошибка: {ex.Message}");
+            OnLog?.Invoke($"Ошибка: {ex.Message}");
             OnStateChanged?.Invoke(ConnectionState.Error, "");
             return false;
         }
@@ -106,7 +106,7 @@ public class VpnService : IDisposable {
     }
 
     public async Task DisconnectAsync() {
-        OnLog?.Invoke("⏹️ Отключение...");
+        OnLog?.Invoke("Отключение...");
         OnStateChanged?.Invoke(ConnectionState.Disconnecting, "");
 
         _cts?.Cancel();
@@ -115,7 +115,7 @@ public class VpnService : IDisposable {
             try {
                 byte[] disconnectMsg = Encoding.UTF8.GetBytes("DISCONNECT");
                 await _udpClient.SendAsync(disconnectMsg, disconnectMsg.Length);
-                OnLog?.Invoke($"📤 Отправлен DISCONNECT серверу");
+                OnLog?.Invoke($"Отправлен DISCONNECT серверу");
             } catch { }
 
             try {
@@ -131,7 +131,7 @@ public class VpnService : IDisposable {
         _virtualIp = "0.0.0.0";
 
         OnStateChanged?.Invoke(ConnectionState.Disconnected, "");
-        OnLog?.Invoke("🔌 Отключено");
+        OnLog?.Invoke("Отключено");
     }
 
     public void Dispose() {
