@@ -25,7 +25,7 @@ public class HelpCommand : ICommand {
         userManager.UpdateActivity(userId);
 
         var sb = new StringBuilder();
-        sb.AppendLine("🤖 *VPN Bot - Справка*");
+        sb.AppendLine("*VPN Bot - Справка*");
         sb.AppendLine();
         sb.AppendLine("*Доступные команды:*");
         sb.AppendLine();
