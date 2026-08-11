@@ -24,17 +24,17 @@ public class StartCommand : ICommand {
         userManager.UpdateActivity(userId);
 
         var welcomeMessage = $@"
-            🎉 *Добро пожаловать в VPN Bot, {firstName}!* 🎉
+            *Добро пожаловать в VPN Bot, {firstName}!*
 
             Этот бот позволяет управлять VPN сервером прямо из Telegram.
 
             *Доступные команды:*
-            /stats - 📊 Статистика сервера
-            /clients - 👥 Список клиентов
-            /traffic - 📈 Детальная статистика трафика
-            /kick <id> - 🔨 Отключить клиента
-            /ban <id> - 🚫 Забанить клиента
-            /help - ❓ Помощь
+            /stats - Статистика сервера
+            /clients - Список клиентов
+            /traffic - Детальная статистика трафика
+            /kick <id> - Отключить клиента
+            /ban <id> - Забанить клиента
+            /help - Помощь
 
             *Быстрые действия:*
             Используйте кнопки ниже для быстрого доступа.
