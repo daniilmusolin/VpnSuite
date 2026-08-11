@@ -30,14 +30,14 @@ public class ClientsCommand : ICommand {
             if (!clients.Any()) {
                 await botClient.SendTextMessageAsync(
                     message.Chat.Id,
-                    "📭 *Нет активных клиентов*",
+                    "*Нет активных клиентов*",
                     parseMode: ParseMode.Markdown,
                     cancellationToken: cancellationToken);
                 return;
             }
 
             var sb = new StringBuilder();
-            sb.AppendLine($"👥 *Активные клиенты ({clients.Count})*\n");
+            sb.AppendLine($"*Активные клиенты ({clients.Count})*\n");
 
             // Создаем список рядов кнопок
             var buttons = new List<List<InlineKeyboardButton>>();
@@ -46,18 +46,18 @@ public class ClientsCommand : ICommand {
                 var totalMB = (client.BytesSent + client.BytesReceived) / (1024.0 * 1024);
 
                 sb.AppendLine($"• *{client.ClientId}*");
-                sb.AppendLine($"  🌐 IP: {client.VirtualIp ?? "N/A"}");
-                sb.AppendLine($"  📥 ↓ {FormatBytes(client.BytesReceived)} | 📤 ↑ {FormatBytes(client.BytesSent)}");
-                sb.AppendLine($"  📊 Всего: {totalMB:F1} MB");
-                sb.AppendLine($"  ⏱️ Активность: {client.LastActivity:HH:mm:ss}");
+                sb.AppendLine($"  IP: {client.VirtualIp ?? "N/A"}");
+                sb.AppendLine($"  ↓ {FormatBytes(client.BytesReceived)} | ↑ {FormatBytes(client.BytesSent)}");
+                sb.AppendLine($"  Всего: {totalMB:F1} MB");
+                sb.AppendLine($"  Активность: {client.LastActivity:HH:mm:ss}");
                 sb.AppendLine();
 
                 // Добавляем кнопки для каждого клиента
                 if (userManager.CanKick(userId)) {
                     var row = new List<InlineKeyboardButton>
                     {
-                        InlineKeyboardButton.WithCallbackData($"🔨 Кик {client.ClientId}", $"kick_{client.ClientId}"),
-                        InlineKeyboardButton.WithCallbackData($"🚫 Бан {client.ClientId}", $"ban_{client.ClientId}")
+                        InlineKeyboardButton.WithCallbackData($"Кик {client.ClientId}", $"kick_{client.ClientId}"),
+                        InlineKeyboardButton.WithCallbackData($"Бан {client.ClientId}", $"ban_{client.ClientId}")
                     };
                     buttons.Add(row);
                 }
@@ -66,7 +66,7 @@ public class ClientsCommand : ICommand {
             // Добавляем кнопку обновления
             buttons.Add(new List<InlineKeyboardButton>
             {
-                InlineKeyboardButton.WithCallbackData("🔄 Обновить", "refresh_clients")
+                InlineKeyboardButton.WithCallbackData("Обновить", "refresh_clients")
             });
 
             var keyboard = new InlineKeyboardMarkup(buttons);
@@ -80,7 +80,7 @@ public class ClientsCommand : ICommand {
         } catch (Exception ex) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                $"❌ Ошибка получения списка клиентов: {ex.Message}",
+                $"Ошибка получения списка клиентов: {ex.Message}",
                 cancellationToken: cancellationToken);
         }
     }
