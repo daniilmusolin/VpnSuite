@@ -86,12 +86,12 @@ namespace VpnClientWPF.ViewModels {
         public string StateIcon {
             get {
                 return State switch {
-                    ConnectionState.Connected => "🔒",
-                    ConnectionState.Connecting => "⏳",
-                    ConnectionState.Handshaking => "🤝",
-                    ConnectionState.Disconnecting => "⏳",
-                    ConnectionState.Error => "⚠️",
-                    _ => "🔓"
+                    ConnectionState.Connected => "Connected",
+                    ConnectionState.Connecting => "Connecting",
+                    ConnectionState.Handshaking => "Handshaking",
+                    ConnectionState.Disconnecting => "Disconnecting",
+                    ConnectionState.Error => "Error",
+                    _ => "Unknown"
                 };
             }
         }
@@ -109,7 +109,7 @@ namespace VpnClientWPF.ViewModels {
 
         private async Task ConnectAsync() {
             if (string.IsNullOrWhiteSpace(ServerAddress)) {
-                AddLog("❌ Введите адрес сервера");
+                AddLog("Введите адрес сервера");
                 return;
             }
 
@@ -150,9 +150,9 @@ namespace VpnClientWPF.ViewModels {
                 State = state;
                 if (state == ConnectionState.Connected) {
                     LocalIp = ip;
-                    AddLog($"✅ Подключено! IP: {ip}");
+                    AddLog($"Подключено! IP: {ip}");
                 } else if (state == ConnectionState.Error) {
-                    AddLog($"❌ Ошибка подключения");
+                    AddLog($"Ошибка подключения");
                 }
             });
         }
