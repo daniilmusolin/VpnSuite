@@ -34,17 +34,17 @@ public class TrafficCommand : ICommand {
                 var avgSpeed = (stats.CurrentSendSpeed + stats.CurrentReceiveSpeed) / 2;
 
                 var report = new StringBuilder();
-                report.AppendLine("📊 *ОБЩАЯ СТАТИСТИКА ТРАФИКА*");
+                report.AppendLine("*ОБЩАЯ СТАТИСТИКА ТРАФИКА*");
                 report.AppendLine("━━━━━━━━━━━━━━━━━━━━━━");
-                report.AppendLine($"📥 *Загружено:* {FormatBytes(stats.TotalBytesReceived)}");
-                report.AppendLine($"📤 *Отправлено:* {FormatBytes(stats.TotalBytesSent)}");
-                report.AppendLine($"📦 *Всего:* {totalMB:F1} MB");
+                report.AppendLine($"*Загружено:* {FormatBytes(stats.TotalBytesReceived)}");
+                report.AppendLine($"*Отправлено:* {FormatBytes(stats.TotalBytesSent)}");
+                report.AppendLine($"*Всего:* {totalMB:F1} MB");
                 report.AppendLine("━━━━━━━━━━━━━━━━━━━━━━");
-                report.AppendLine($"⚡ *Скорость загрузки:* {FormatSpeed(stats.CurrentReceiveSpeed)}");
-                report.AppendLine($"⚡ *Скорость отправки:* {FormatSpeed(stats.CurrentSendSpeed)}");
-                report.AppendLine($"📈 *Средняя скорость:* {FormatSpeed((long)avgSpeed)}");
+                report.AppendLine($"*Скорость загрузки:* {FormatSpeed(stats.CurrentReceiveSpeed)}");
+                report.AppendLine($"*Скорость отправки:* {FormatSpeed(stats.CurrentSendSpeed)}");
+                report.AppendLine($"*Средняя скорость:* {FormatSpeed((long)avgSpeed)}");
                 report.AppendLine("━━━━━━━━━━━━━━━━━━━━━━");
-                report.AppendLine($"👥 *Активных клиентов:* {stats.ActiveClients}");
+                report.AppendLine($"*Активных клиентов:* {stats.ActiveClients}");
 
                 await botClient.SendTextMessageAsync(
                     message.Chat.Id,
@@ -59,7 +59,7 @@ public class TrafficCommand : ICommand {
                 if (client == null) {
                     await botClient.SendTextMessageAsync(
                         message.Chat.Id,
-                        $"❌ Клиент `{clientId}` не найден",
+                        $"Клиент `{clientId}` не найден",
                         parseMode: ParseMode.Markdown,
                         cancellationToken: cancellationToken);
                     return;
@@ -69,19 +69,19 @@ public class TrafficCommand : ICommand {
                 var receivedMB = client.BytesReceived / (1024.0 * 1024);
 
                 var report = new StringBuilder();
-                report.AppendLine($"📊 *СТАТИСТИКА КЛИЕНТА*");
+                report.AppendLine($"*СТАТИСТИКА КЛИЕНТА*");
                 report.AppendLine($"━━━━━━━━━━━━━━━━━━━━━━");
-                report.AppendLine($"🆔 *ID:* `{client.ClientId}`");
-                report.AppendLine($"🌐 *VPN IP:* {client.VirtualIp ?? "N/A"}");
-                report.AppendLine($"📍 *Реальный IP:* {client.RemoteEndpoint ?? "N/A"}");
+                report.AppendLine($"*ID:* `{client.ClientId}`");
+                report.AppendLine($"*VPN IP:* {client.VirtualIp ?? "N/A"}");
+                report.AppendLine($"*Реальный IP:* {client.RemoteEndpoint ?? "N/A"}");
                 report.AppendLine("━━━━━━━━━━━━━━━━━━━━━━");
-                report.AppendLine($"📤 *Отправлено:* {sentMB:F1} MB");
-                report.AppendLine($"📥 *Получено:* {receivedMB:F1} MB");
-                report.AppendLine($"📦 *Всего:* {sentMB + receivedMB:F1} MB");
+                report.AppendLine($"*Отправлено:* {sentMB:F1} MB");
+                report.AppendLine($"*Получено:* {receivedMB:F1} MB");
+                report.AppendLine($"*Всего:* {sentMB + receivedMB:F1} MB");
                 report.AppendLine("━━━━━━━━━━━━━━━━━━━━━━");
-                report.AppendLine($"📦 *Пакетов:* {client.PacketsSent:N0} / {client.PacketsReceived:N0}");
-                report.AppendLine($"⏱️ *Активность:* {client.LastActivity:HH:mm:ss}");
-                report.AppendLine($"🔐 *Аутентифицирован:* {(client.IsAuthenticated ? "✅ Да" : "❌ Нет")}");
+                report.AppendLine($"*Пакетов:* {client.PacketsSent:N0} / {client.PacketsReceived:N0}");
+                report.AppendLine($"*Активность:* {client.LastActivity:HH:mm:ss}");
+                report.AppendLine($"*Аутентифицирован:* {(client.IsAuthenticated ? "Да" : "Нет")}");
 
                 await botClient.SendTextMessageAsync(
                     message.Chat.Id,
@@ -92,7 +92,7 @@ public class TrafficCommand : ICommand {
         } catch (Exception ex) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                $"❌ Ошибка: {ex.Message}",
+                $"Ошибка: {ex.Message}",
                 cancellationToken: cancellationToken);
         }
     }
