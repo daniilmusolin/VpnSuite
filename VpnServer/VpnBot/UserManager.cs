@@ -15,11 +15,11 @@ public class BotUser {
 
     public string DisplayName => !string.IsNullOrEmpty(Username) ? $"@{Username}" : FirstName ?? UserId.ToString();
     public string RoleIcon => Role switch {
-        UserRole.Owner => "👑",
-        UserRole.Admin => "🛡️",
-        UserRole.Viewer => "👁️",
-        UserRole.Banned => "🚫",
-        _ => "❓"
+        UserRole.Owner => "Owner",
+        UserRole.Admin => "Admin",
+        UserRole.Viewer => "Viewer",
+        UserRole.Banned => "Banned",
+        _ => "Unknown"
     };
 }
 
