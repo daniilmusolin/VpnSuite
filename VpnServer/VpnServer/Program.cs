@@ -28,7 +28,7 @@ class Program {
         _cts = new CancellationTokenSource();
         Console.CancelKeyPress += (sender, e) => {
             e.Cancel = true;
-            Console.WriteLine("\n🛑 Остановка сервера...");
+            Console.WriteLine("\nОстановка сервера...");
             _cts?.Cancel();
         };
 
@@ -55,9 +55,9 @@ class Program {
             // Запуск HTTP API для Telegram бота
             _ = Task.Run(() => StartApiServer(_server, _trafficMonitor, _cts.Token));
 
-            Console.WriteLine("\n✅ VPN Server полностью запущен!");
-            Console.WriteLine("📡 Telegram API доступен на порту 5000");
-            Console.WriteLine("🔑 API Key сохранен в api_key.txt");
+            Console.WriteLine("\nVPN Server полностью запущен!");
+            Console.WriteLine("Telegram API доступен на порту 5000");
+            Console.WriteLine("API Key сохранен в api_key.txt");
             Console.WriteLine("\nНажмите Ctrl+C для остановки...");
 
             await Task.Delay(-1, _cts.Token);
@@ -65,7 +65,7 @@ class Program {
             _logger.Info("Server shutdown requested");
         } catch (Exception ex) {
             _logger.Error($"Fatal error: {ex.Message}");
-            Console.WriteLine($"❌ Fatal error: {ex.Message}");
+            Console.WriteLine($"Fatal error: {ex.Message}");
         } finally {
             await ShutdownAsync();
         }
@@ -103,7 +103,7 @@ class Program {
 
     private static async Task ShutdownAsync() {
         _logger.Info("Shutting down...");
-        Console.WriteLine("\n🛑 Shutting down...");
+        Console.WriteLine("\nShutting down...");
 
         if (_server != null) {
             await _server.StopAsync();
@@ -113,11 +113,10 @@ class Program {
         _cts?.Dispose();
 
         _logger.Info("Server stopped");
-        Console.WriteLine("✅ Server stopped. Goodbye!");
+        Console.WriteLine("Server stopped. Goodbye!");
     }
 }
 
-// Простой ConfigManager для загрузки конфигурации
 public class ConfigManager<T> where T : new() {
     private readonly string _path;
 
