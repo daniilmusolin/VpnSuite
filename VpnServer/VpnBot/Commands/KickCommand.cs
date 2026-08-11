@@ -25,7 +25,7 @@ public class KickCommand : ICommand {
         if (!userManager.CanKick(userId)) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                "⛔ У вас нет прав на отключение клиентов",
+                "У вас нет прав на отключение клиентов",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -34,7 +34,7 @@ public class KickCommand : ICommand {
         if (parts.Length < 2) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                "❌ Использование: `/kick CLIENT_ID`\n\nИспользуйте `/clients` для просмотра ID клиентов.",
+                "Использование: `/kick CLIENT_ID`\n\nИспользуйте `/clients` для просмотра ID клиентов.",
                 parseMode: ParseMode.Markdown,
                 cancellationToken: cancellationToken);
             return;
@@ -48,20 +48,20 @@ public class KickCommand : ICommand {
             if (result) {
                 await botClient.SendTextMessageAsync(
                     message.Chat.Id,
-                    $"✅ Клиент `{clientId}` отключен",
+                    $"Клиент `{clientId}` отключен",
                     parseMode: ParseMode.Markdown,
                     cancellationToken: cancellationToken);
             } else {
                 await botClient.SendTextMessageAsync(
                     message.Chat.Id,
-                    $"❌ Не удалось отключить клиента `{clientId}`. Возможно, клиент не существует.",
+                    $"Не удалось отключить клиента `{clientId}`. Возможно, клиент не существует.",
                     parseMode: ParseMode.Markdown,
                     cancellationToken: cancellationToken);
             }
         } catch (Exception ex) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                $"❌ Ошибка: {ex.Message}",
+                $"Ошибка: {ex.Message}",
                 cancellationToken: cancellationToken);
         }
     }
