@@ -28,13 +28,13 @@ class Program {
         var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (sender, e) => {
             e.Cancel = true;
-            Console.WriteLine("\n🛑 Остановка бота...");
+            Console.WriteLine("\nОстановка бота...");
             cts.Cancel();
         };
 
         try {
             await host.StartAsync(cts.Token);
-            Console.WriteLine("✅ Бот запущен! Нажмите Ctrl+C для остановки.");
+            Console.WriteLine("Бот запущен! Нажмите Ctrl+C для остановки.");
             await Task.Delay(-1, cts.Token);
         } catch (OperationCanceledException) {
             Console.WriteLine("Бот остановлен.");
