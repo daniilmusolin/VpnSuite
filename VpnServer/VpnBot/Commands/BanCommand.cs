@@ -25,7 +25,7 @@ public class BanCommand : ICommand {
         if (!userManager.CanBan(userId)) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                "⛔ У вас нет прав на блокировку клиентов",
+                "У вас нет прав на блокировку клиентов",
                 cancellationToken: cancellationToken);
             return;
         }
@@ -34,7 +34,7 @@ public class BanCommand : ICommand {
         if (parts.Length < 2) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                "❌ Использование: `/ban CLIENT_ID`\n\nИспользуйте `/clients` для просмотра ID клиентов.",
+                "Использование: `/ban CLIENT_ID`\n\nИспользуйте `/clients` для просмотра ID клиентов.",
                 parseMode: ParseMode.Markdown,
                 cancellationToken: cancellationToken);
             return;
@@ -48,20 +48,20 @@ public class BanCommand : ICommand {
             if (result) {
                 await botClient.SendTextMessageAsync(
                     message.Chat.Id,
-                    $"🚫 Клиент `{clientId}` забанен",
+                    $"Клиент `{clientId}` забанен",
                     parseMode: ParseMode.Markdown,
                     cancellationToken: cancellationToken);
             } else {
                 await botClient.SendTextMessageAsync(
                     message.Chat.Id,
-                    $"❌ Не удалось забанить клиента `{clientId}`. Возможно, клиент не существует.",
+                    $"Не удалось забанить клиента `{clientId}`. Возможно, клиент не существует.",
                     parseMode: ParseMode.Markdown,
                     cancellationToken: cancellationToken);
             }
         } catch (Exception ex) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                $"❌ Ошибка: {ex.Message}",
+                $"Ошибка: {ex.Message}",
                 cancellationToken: cancellationToken);
         }
     }
