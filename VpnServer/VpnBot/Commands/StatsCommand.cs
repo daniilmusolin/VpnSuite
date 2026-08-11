@@ -25,34 +25,34 @@ public class StatsCommand : ICommand {
         try {
             var stats = await vpnApi.GetServerStatsAsync();
 
-            var statusIcon = stats.IsRunning ? "🟢" : "🔴";
+            var statusIcon = stats.IsRunning ? "Yes" : "No";
             var statusText = stats.IsRunning ? "РАБОТАЕТ" : "ОСТАНОВЛЕН";
 
             var statsMessage = $@"
                 {statusIcon} *СТАТИСТИКА VPN СЕРВЕРА*
 
                 ━━━━━━━━━━━━━━━━━━━━━━
-                📡 *Статус:* {statusText}
-                👥 *Активных клиентов:* {stats.ActiveClients}
+                *Статус:* {statusText}
+                *Активных клиентов:* {stats.ActiveClients}
                 ━━━━━━━━━━━━━━━━━━━━━━
 
-                📥 *Загрузка:* {FormatBytes(stats.TotalBytesReceived)}
-                📤 *Отправка:* {FormatBytes(stats.TotalBytesSent)}
+                *Загрузка:* {FormatBytes(stats.TotalBytesReceived)}
+                *Отправка:* {FormatBytes(stats.TotalBytesSent)}
                 ━━━━━━━━━━━━━━━━━━━━━━
 
-                ⚡ *Скорость загрузки:* {FormatSpeed(stats.CurrentReceiveSpeed)}
-                ⚡ *Скорость отправки:* {FormatSpeed(stats.CurrentSendSpeed)}
+                *Скорость загрузки:* {FormatSpeed(stats.CurrentReceiveSpeed)}
+                *Скорость отправки:* {FormatSpeed(stats.CurrentSendSpeed)}
                 ━━━━━━━━━━━━━━━━━━━━━━
 
-                🔐 *Шифрование:* {stats.CipherSuite ?? "AES-256-GCM"}
-                📅 *Время работы:* {stats.Uptime ?? "N/A"}
+                *Шифрование:* {stats.CipherSuite ?? "AES-256-GCM"}
+                *Время работы:* {stats.Uptime ?? "N/A"}
 
-                🕐 *Обновлено:* {DateTime.Now:HH:mm:ss}
+                *Обновлено:* {DateTime.Now:HH:mm:ss}
                 ";
 
             var inlineKeyboard = new InlineKeyboardMarkup(new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData("🔄 Обновить", "refresh_stats") }
+                new[] { InlineKeyboardButton.WithCallbackData("Обновить", "refresh_stats") }
             });
 
             await botClient.SendTextMessageAsync(
@@ -64,7 +64,7 @@ public class StatsCommand : ICommand {
         } catch (Exception ex) {
             await botClient.SendTextMessageAsync(
                 message.Chat.Id,
-                $"❌ Ошибка получения статистики: {ex.Message}",
+                $"Ошибка получения статистики: {ex.Message}",
                 cancellationToken: cancellationToken);
         }
     }
