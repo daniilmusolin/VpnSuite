@@ -24,8 +24,8 @@ public static class VpnApiAuth {
                     .Substring(0, 48);
 
                 File.WriteAllText(keyFile, _apiKey);
-                Console.WriteLine($"🔑 Сгенерирован новый API ключ: {_apiKey}");
-                Console.WriteLine("⚠️ СОХРАНИТЕ ЕГО! Он нужен для Telegram бота");
+                Console.WriteLine($"Сгенерирован новый API ключ: {_apiKey}");
+                Console.WriteLine("СОХРАНИТЕ ЕГО! Он нужен для Telegram бота");
             }
         }
 
