@@ -55,9 +55,9 @@ public sealed class ServerCore : IDisposable {
             _ = Task.Run(() => CleanupInactiveClientsLoop(_cts.Token), _cts.Token);
 
             _logger.Info($"Сервер успешно запущен на порту {_config.ListenPort}");
-            Console.WriteLine($"\n✅ Сервер слушает {_config.ListenAddress}:{_config.ListenPort}");
-            Console.WriteLine($"📊 Максимум клиентов: {_config.MaxClients}");
-            Console.WriteLine($"🔐 Шифрование: {_config.CipherSuite}\n");
+            Console.WriteLine($"\nСервер слушает {_config.ListenAddress}:{_config.ListenPort}");
+            Console.WriteLine($"Максимум клиентов: {_config.MaxClients}");
+            Console.WriteLine($"Шифрование: {_config.CipherSuite}\n");
         } catch (Exception ex) {
             _logger.Error($"Не удалось запустить сервер: {ex.Message}");
             OnError?.Invoke($"Ошибка запуска: {ex.Message}");
@@ -149,8 +149,6 @@ public sealed class ServerCore : IDisposable {
             }
         }
     }
-
-    // ============= API Methods =============
 
     public List<ClientInfo> GetAllClients() {
         return _clients.Values.Select(session => new ClientInfo {
