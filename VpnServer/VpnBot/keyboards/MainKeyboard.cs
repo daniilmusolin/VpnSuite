@@ -6,8 +6,8 @@ public static class MainKeyboard {
     public static ReplyKeyboardMarkup GetKeyboard() {
         return new ReplyKeyboardMarkup(new[]
         {
-            new[] { new KeyboardButton("📊 Statistics"), new KeyboardButton("👥 Clients") },
-            new[] { new KeyboardButton("❓ Help"), new KeyboardButton("🔄 Refresh") }
+            new[] { new KeyboardButton("Statistics"), new KeyboardButton("Clients") },
+            new[] { new KeyboardButton("Help"), new KeyboardButton("Refresh") }
         }) 
         {
             ResizeKeyboard = true,
