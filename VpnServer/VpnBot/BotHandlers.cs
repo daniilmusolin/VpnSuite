@@ -41,7 +41,7 @@ public class BotHandlers {
         var chatId = message.Chat.Id;
 
         if (!_userManager.IsAuthorized(userId)) {
-            await botClient.SendTextMessageAsync(chatId, "⛔ У вас нет доступа к этому боту.", cancellationToken: cancellationToken);
+            await botClient.SendTextMessageAsync(chatId, "У вас нет доступа к этому боту.", cancellationToken: cancellationToken);
             return;
         }
 
@@ -55,20 +55,20 @@ public class BotHandlers {
             if (_commands.TryGetValue(commandName, out var command)) {
                 await command.ExecuteAsync(botClient, message, cancellationToken);
             } else {
-                await botClient.SendTextMessageAsync(chatId, "❓ Неизвестная команда. Используйте /help", cancellationToken: cancellationToken);
+                await botClient.SendTextMessageAsync(chatId, "Неизвестная команда. Используйте /help", cancellationToken: cancellationToken);
             }
         } else {
             switch (messageText) {
-                case "📊 Statistics":
+                case "Statistics":
                     await _commands["/stats"].ExecuteAsync(botClient, message, cancellationToken);
                     break;
-                case "👥 Clients":
+                case "Clients":
                     await _commands["/clients"].ExecuteAsync(botClient, message, cancellationToken);
                     break;
-                case "🔄 Refresh":
+                case "Refresh":
                     await _commands["/stats"].ExecuteAsync(botClient, message, cancellationToken);
                     break;
-                case "❓ Help":
+                case "Help":
                     await _commands["/help"].ExecuteAsync(botClient, message, cancellationToken);
                     break;
                 default:
@@ -83,7 +83,7 @@ public class BotHandlers {
         var chatId = callbackQuery.Message?.Chat.Id ?? 0;
 
         if (!_userManager.IsAuthorized(userId)) {
-            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "⛔ Нет доступа", cancellationToken: cancellationToken);
+            await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "Нет доступа", cancellationToken: cancellationToken);
             return;
         }
 
@@ -100,23 +100,23 @@ public class BotHandlers {
             var clientId = data.Replace("kick_", "");
             if (_userManager.CanKick(userId)) {
                 await _vpnApi.KickClientAsync(clientId);
-                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, $"✅ Клиент {clientId} отключен", cancellationToken: cancellationToken);
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, $"Клиент {clientId} отключен", cancellationToken: cancellationToken);
 
                 var fakeMessage = new Message { Chat = new Chat { Id = chatId }, From = callbackQuery.From, Text = "/clients" };
                 await _commands["/clients"].ExecuteAsync(botClient, fakeMessage, cancellationToken);
             } else {
-                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "⛔ У вас нет прав на кик", cancellationToken: cancellationToken);
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "У вас нет прав на кик", cancellationToken: cancellationToken);
             }
         } else if (data.StartsWith("ban_")) {
             var clientId = data.Replace("ban_", "");
             if (_userManager.CanBan(userId)) {
                 await _vpnApi.BanClientAsync(clientId);
-                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, $"🚫 Клиент {clientId} забанен", cancellationToken: cancellationToken);
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, $"Клиент {clientId} забанен", cancellationToken: cancellationToken);
 
                 var fakeMessage = new Message { Chat = new Chat { Id = chatId }, From = callbackQuery.From, Text = "/clients" };
                 await _commands["/clients"].ExecuteAsync(botClient, fakeMessage, cancellationToken);
             } else {
-                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "⛔ У вас нет прав на бан", cancellationToken: cancellationToken);
+                await botClient.AnswerCallbackQueryAsync(callbackQuery.Id, "У вас нет прав на бан", cancellationToken: cancellationToken);
             }
         }
 
