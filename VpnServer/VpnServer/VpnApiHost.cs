@@ -43,13 +43,10 @@ public class VpnApiHost {
             await next();
         });
 
-        // 📊 GET /api/stats - статистика сервера
         _app.MapGet("/api/stats", () => _server.GetServerStats());
-
-        // 👥 GET /api/clients - список клиентов
+        
         _app.MapGet("/api/clients", () => _server.GetAllClients());
 
-        // 🔨 DELETE /api/clients/{id} - отключение клиента
         _app.MapDelete("/api/clients/{id}", (string id) => {
             var result = _server.KickClient(id);
             return result
@@ -57,7 +54,6 @@ public class VpnApiHost {
                 : Results.NotFound(new { success = false, message = $"Client {id} not found" });
         });
 
-        // 🚫 POST /api/clients/{id}/ban - блокировка клиента
         _app.MapPost("/api/clients/{id}/ban", (string id) => {
             var result = _server.BanClient(id);
             return result
@@ -65,29 +61,26 @@ public class VpnApiHost {
                 : Results.NotFound(new { success = false, message = $"Client {id} not found" });
         });
 
-        // 🛑 POST /api/server/stop - остановка сервера
         _app.MapPost("/api/server/stop", async () => {
             await _server.StopAsync();
             return Results.Ok(new { success = true, message = "Server stopping..." });
         });
 
-        // ▶️ POST /api/server/start - запуск сервера
         _app.MapPost("/api/server/start", async () => {
             await _server.StartAsync();
             return Results.Ok(new { success = true, message = "Server starting..." });
         });
 
-        // 💚 GET /api/health - health check (без аутентификации)
         _app.MapGet("/api/health", () => new {
             status = "healthy",
             activeClients = _server.ActiveClients,
             timestamp = DateTime.UtcNow
         });
 
-        Console.WriteLine($"\n✅ VPN API запущен на порту {port}");
-        Console.WriteLine($"🔑 API Key: {_apiKey}");
-        Console.WriteLine($"📡 Endpoint: http://0.0.0.0:{port}/api/");
-        Console.WriteLine($"💚 Health check: http://0.0.0.0:{port}/api/health\n");
+        Console.WriteLine($"\nVPN API запущен на порту {port}");
+        Console.WriteLine($"API Key: {_apiKey}");
+        Console.WriteLine($"Endpoint: http://0.0.0.0:{port}/api/");
+        Console.WriteLine($"Health check: http://0.0.0.0:{port}/api/health\n");
 
         await _app.RunAsync($"http://0.0.0.0:{port}");
     }
